@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Option 1: Gradient background */
+            background: linear-gradient(135deg, #559654, #679354);
+            
+            /* Option 2: Image background (uncomment to use) */
+            /* background: url('https://example.com/your-image.jpg') no-repeat center center fixed;
+            background-size: cover; */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1100px; /* Wider container */
+            height: 80vh;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        #chatbox {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #e9ecef;
+        }
+        #chatbox p {
+            margin-bottom: 10px;
+        }
+        #chatbox p strong {
+            color: #007bff;
+        }
+        #chatbox p:nth-child(odd) strong {
+            color: #28a745;
+        }
+        .input-area {
+            display: flex;
+            padding: 20px; /* Increased padding */
+            background-color: #f4f6f9;
+            border-top: 1px solid #ddd;
+        }
+        #userInput {
+            flex: 1;
+            padding: 15px; /* Increased input height */
+            font-size: 18px; /* Larger text */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        #sendButton {
+            padding: 15px 25px;
+            margin-left: 10px;
+            background-color: #136c10;
+            color: #fff;
+            font-size: 16px; /* Increased button text size */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #sendButton:hover {
+            background-color: #0056b3;
+        }
+        #sendButton:active {
+            background-color: #003f7f;
+        }
+        /* Scrollbar styling */
+        #chatbox::-webkit-scrollbar {
+            width: 10px;
+        }
+        #chatbox::-webkit-scrollbar-thumb {
+            background-color: #007bff;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="chatbox"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type your message here...">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#sendButton').on('click', function() {
+                var userInput = $('#userInput').val();
+                if (userInput.trim() !== "") {
+                    $('#chatbox').append('<p><strong>You:</strong> ' + userInput + '</p>');
+                    $('#userInput').val(''); // Clear the input box
+
+                    // Scroll chatbox to the bottom on new message
+                    $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+
+                    $.ajax({
+                        url: '/get_response',
+                        method: 'POST',
+                        data: {msg: userInput},
+                        success: function(response) {
+                            $('#chatbox').append('<p><strong>Bot:</strong> ' + response.response + '</p>');
+                            $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+                        }
+                    });
+                }
+            });
+
+            // Allow 'Enter' key to submit messages
+            $('#userInput').on('keypress', function(e) {
+                if (e.which == 13) {
+                    $('#sendButton').click();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
